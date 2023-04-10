@@ -44,6 +44,7 @@ with col3:
 datetime = pd.to_datetime(df['Launched Time'])
 #datetime = datetime.dt.hour
 df['Launched Time'] = datetime
+df = df.drop(['Creator ID','Creator','Nickname'], axis=1)
 
 for i in range(len(df)):
   s = df['Duration'][i]
@@ -60,10 +61,16 @@ df['CTR'] = pd.to_numeric(df['CTR'])
 df['conversion'] = df['Unit Sales']/df['Viewers']
 df['conversion'] = df['conversion'].fillna(0)
 df.sort_values(by='Launched Time',inplace=True)
+df = df.reset_index(drop=True)
 
+df_norm = df.copy()
+for column in df_norm.columns:
+    df_norm[column] = (df_norm[column] - df_norm[column].min()) / (df_norm[column].max() - df_norm[column].min())    
+  
 x = 'Launched Time'
+y = [option,option2]
 
 fig = px.line(df,x=x ,y=option)
-fig2 = px.line(df,x=x, y=option2)
+fig2 = px.line(df_norm, y=y)
 st.plotly_chart(fig)
 st.plotly_chart(fig2)
