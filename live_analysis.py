@@ -1,7 +1,7 @@
 import pandas as pd
-import plotly.express as px
 import re
 import streamlit as st
+import plotly.express as px
 columns = ['Duration','Revenue (Rp)','Products',	
            'Different Products Sold','Orders Created','Orders Paid',
            'Unit Sales','Buyers','Average Price (Rp)','CO rate',
