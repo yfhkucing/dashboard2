@@ -32,6 +32,7 @@ with col2:
     )
 
 datetime = pd.to_datetime(df['Launched Time'])
+datetime = datetime.dt.hour
 df['Launched Time'] = datetime
 
 for i in range(len(df)):
