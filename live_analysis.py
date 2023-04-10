@@ -3,7 +3,7 @@ import plotly.graph_objs as go
 import re
 import numpy as np
 import streamlit as st
-columns = ['Launched Time','Duration','Revenue (Rp)','Products',	
+columns = ['Duration','Revenue (Rp)','Products',	
            'Different Products Sold','Orders Created','Orders Paid',
            'Unit Sales','Buyers','Average Price (Rp)','CO rate',
            'Viewers','Views','ACU','PCU','Avg. Viewing Duration',
@@ -48,6 +48,6 @@ df['Duration']= pd.to_numeric(df['Duration'])
 df['CO rate'] = pd.to_numeric(df['CO rate'])
 df['CTR'] = pd.to_numeric(df['CTR'])
 df.sort_values(by='Launched Time',inplace=True)
-fig = go.Figure([go.Scatter(x=df['Launched Time'], y=df['Duration'])])
+fig = go.Figure([go.Scatter(x=df['Launched Time'], y=df[option])])
 
 st.plotly_chart(fig)
