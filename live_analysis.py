@@ -30,7 +30,6 @@ with col2:
         label_visibility=st.session_state.visibility,
         disabled=st.session_state.disabled,
     )
-st.write(option)
 
 datetime = pd.to_datetime(df['Launched Time'])
 df['Launched Time'] = datetime
