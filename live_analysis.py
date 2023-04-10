@@ -2,6 +2,9 @@ import pandas as pd
 import plotly.graph_objs as go
 import re
 import numpy as np
+import streamlit as st
+
+st.write("ini dashboard")
 
 df = pd.read_excel('Live Analysis20230408061732 (live analysis last 7 days).xlsx',
                    sheet_name='Sheet2')
@@ -23,4 +26,5 @@ df['CO rate'] = pd.to_numeric(df['CO rate'])
 df['CTR'] = pd.to_numeric(df['CTR'])
 df.sort_values(by='Launched Time',inplace=True)
 fig = go.Figure([go.Scatter(x=df['Launched Time'], y=df['Duration'])])
-fig.show()
+
+st.plotly_chart(fig)
