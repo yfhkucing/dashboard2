@@ -1,10 +1,7 @@
 import pandas as pd
-import plotly.graph_objs as go
 import plotly.express as px
 import re
-import numpy as np
 import streamlit as st
-import plotly.subplots as make_subplots
 columns = ['Duration','Revenue (Rp)','Products',	
            'Different Products Sold','Orders Created','Orders Paid',
            'Unit Sales','Buyers','Average Price (Rp)','CO rate',
