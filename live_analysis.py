@@ -3,11 +3,34 @@ import plotly.graph_objs as go
 import re
 import numpy as np
 import streamlit as st
-
-st.write("ini dashboard")
+columns = ['Launched Time','Duration','Revenue (Rp)','Products',	
+           'Different Products Sold','Orders Created','Orders Paid',
+           'Unit Sales','Buyers','Average Price (Rp)','CO rate',
+           'Viewers','Views','ACU','PCU','Avg. Viewing Duration',
+           'Comments','Shares','Likes','New Followers','Product Impressions',
+           'Product Clicks','CTR']
 
 df = pd.read_excel('Live Analysis20230408061732 (live analysis last 7 days).xlsx',
                    sheet_name='Sheet2')
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.checkbox("Disable selectbox widget", key="disabled")
+    st.radio(
+        "Set selectbox label visibility 👉",
+        key="visibility",
+        options=["visible", "hidden", "collapsed"],
+    )
+
+with col2:
+    option = st.selectbox(
+        "Select KPI",
+        (columns),
+        label_visibility=st.session_state.visibility,
+        disabled=st.session_state.disabled,
+    )
+st.write(option)
 
 datetime = pd.to_datetime(df['Launched Time'])
 df['Launched Time'] = datetime
