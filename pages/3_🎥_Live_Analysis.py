@@ -34,46 +34,49 @@ def duration(df):
         df['CTR'][i] = float(df['CTR'][i].replace("%", "")) 
     return df
 
-df = new_header(df)
-datetime = pd.to_datetime(df['Launched Time'])
-df['Launched Time'] = datetime
-df = df.drop(['Creator ID','Creator','Nickname'], axis=1)
-df = duration(df)
-df = numeric(df)
-columns.append('conversion')
-df['conversion'] = df['Unit Sales']/df['Viewers']
-df['conversion'] = df['conversion'].fillna(0)
-df.sort_values(by='Launched Time',inplace=True)
-df = df.reset_index(drop=True)
+def main(df):
+    df = new_header(df)
+    datetime = pd.to_datetime(df['Launched Time'])
+    df['Launched Time'] = datetime
+    df = df.drop(['Creator ID','Creator','Nickname'], axis=1)
+    df = duration(df)
+    df = numeric(df)
+    columns.append('conversion')
+    df['conversion'] = df['Unit Sales']/df['Viewers']
+    df['conversion'] = df['conversion'].fillna(0)
+    df.sort_values(by='Launched Time',inplace=True)
+    df = df.reset_index(drop=True)
 
-df_norm = df.copy()
-for column in df_norm.columns:
-    df_norm[column] = (df_norm[column] - df_norm[column].min()) / (df_norm[column].max() - df_norm[column].min()) 
+    df_norm = df.copy()
+    for column in df_norm.columns:
+        df_norm[column] = (df_norm[column] - df_norm[column].min()) / (df_norm[column].max() - df_norm[column].min()) 
 
-col1, col2, col3 = st.columns(3)
+    col1, col2, col3 = st.columns(3)
 
-with col1:
-    option = st.selectbox(
-        "Select KPI",
-        (columns),
-    )
+    with col1:
+        option = st.selectbox(
+            "Select KPI",
+            (columns),
+        )
 
-with col2:
-    option2 = st.selectbox(
-        "Select KPI 2",
-        (columns),
-    )
+    with col2:
+        option2 = st.selectbox(
+            "Select KPI 2",
+            (columns),
+        )
 
-with col3:
-    option3 = st.selectbox(
-        "Select KPI 3",
-        (columns),
-    )
+    with col3:
+        option3 = st.selectbox(
+            "Select KPI 3",
+            (columns),
+        )
 
-x = 'Launched Time'
-y = [option,option2,option3]
+    x = 'Launched Time'
+    y = [option,option2,option3]
 
-fig = px.line(df,x=x ,y=option)
-fig2 = px.line(df_norm, y=y)
-st.plotly_chart(fig)
-st.plotly_chart(fig2)
+    fig = px.line(df,x=x ,y=option)
+    fig2 = px.line(df_norm, y=y)
+    st.plotly_chart(fig)
+    st.plotly_chart(fig2)
+
+main(df)
