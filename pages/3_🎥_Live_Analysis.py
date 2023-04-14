@@ -7,39 +7,16 @@ columns = ['Duration','Revenue (Rp)','Products',
            'Unit Sales','Buyers','Average Price (Rp)','CO rate',
            'Viewers','Views','ACU','PCU','Avg. Viewing Duration',
            'Comments','Shares','Likes','New Followers','Product Impressions',
-           'Product Clicks','CTR','conversion']
+           'Product Clicks','CTR']
+#new_columns = columns.append('conversion')
+df = pd.read_excel('data\data2.xlsx',
+                   sheet_name='Sheet1')
 
-df = pd.read_excel('data2.xlsx',
-                   sheet_name='Sheet2')
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.checkbox("Disable selectbox widget", key="disabled")
-    st.radio(
-        "Set selectbox label visibility 👉",
-        key="visibility",
-        options=["visible", "hidden", "collapsed"],
-    )
-
-with col2:
-    option = st.selectbox(
-        "Select KPI",
-        (columns),
-        label_visibility=st.session_state.visibility,
-        disabled=st.session_state.disabled,
-    )
-
-with col3:
-    option2 = st.selectbox(
-        "Select KPI 2",
-        (columns),
-        label_visibility=st.session_state.visibility,
-        disabled=st.session_state.disabled,
-    )
-
+new_header = df.iloc[1] #grab the first row for the header
+df = df[2:] #take the data less the header row
+df = df.reset_index(drop=True)
+df.columns = new_header #set the header row as the df header
 datetime = pd.to_datetime(df['Launched Time'])
-#datetime = datetime.dt.hour
 df['Launched Time'] = datetime
 df = df.drop(['Creator ID','Creator','Nickname'], axis=1)
 
@@ -51,10 +28,11 @@ for i in range(len(df)):
   df['Duration'][i] = int(duration)
   df['CO rate'][i] = float(df['CO rate'][i].replace("%", ""))
   df['CTR'][i] = float(df['CTR'][i].replace("%", ""))
+  
+for i in range(len(columns)):
+  df[columns[i]]= pd.to_numeric(df[columns[i]])
 
-df['Duration']= pd.to_numeric(df['Duration'])
-df['CO rate'] = pd.to_numeric(df['CO rate'])
-df['CTR'] = pd.to_numeric(df['CTR'])
+columns.append('conversion')
 df['conversion'] = df['Unit Sales']/df['Viewers']
 df['conversion'] = df['conversion'].fillna(0)
 df.sort_values(by='Launched Time',inplace=True)
@@ -62,10 +40,36 @@ df = df.reset_index(drop=True)
 
 df_norm = df.copy()
 for column in df_norm.columns:
-    df_norm[column] = (df_norm[column] - df_norm[column].min()) / (df_norm[column].max() - df_norm[column].min())    
-  
+    df_norm[column] = (df_norm[column] - df_norm[column].min()) / (df_norm[column].max() - df_norm[column].min()) 
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    option = st.selectbox(
+        "Select KPI",
+        (columns),
+        #label_visibility=st.session_state.visibility,
+        #disabled=st.session_state.disabled,
+    )
+
+with col2:
+    option2 = st.selectbox(
+        "Select KPI 2",
+        (columns),
+        #label_visibility=st.session_state.visibility,
+        #disabled=st.session_state.disabled,
+    )
+
+with col3:
+    option3 = st.selectbox(
+        "Select KPI 3",
+        (columns),
+        #label_visibility=st.session_state.visibility,
+        #disabled=st.session_state.disabled,
+    )
+
 x = 'Launched Time'
-y = [option,option2]
+y = [option,option2,option3]
 
 fig = px.line(df,x=x ,y=option)
 fig2 = px.line(df_norm, y=y)
