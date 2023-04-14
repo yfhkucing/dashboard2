@@ -34,7 +34,7 @@ def duration(df):
         df['CTR'][i] = float(df['CTR'][i].replace("%", "")) 
     return df
 
-def main(df):
+def timeline(df):
     df = new_header(df)
     datetime = pd.to_datetime(df['Launched Time'])
     df['Launched Time'] = datetime
@@ -78,5 +78,27 @@ def main(df):
     fig2 = px.line(df_norm, y=y)
     st.plotly_chart(fig)
     st.plotly_chart(fig2)
+
+def table(df):
+    df = new_header(df)
+    datetime = pd.to_datetime(df['Launched Time'])
+    df['Launched Time'] = datetime
+    df = df.drop(['Creator ID','Creator','Nickname'], axis=1)
+    df = duration(df)
+    df = numeric(df)
+    columns.append('conversion')
+    df['conversion'] = df['Unit Sales']/df['Viewers']
+    df['conversion'] = df['conversion'].fillna(0)
+    df.sort_values(by='Launched Time',inplace=True)
+    df = df.reset_index(drop=True)
+    df['Revenue delta'] = df['Revenue (Rp)'].diff().shift(-1)
+    st.dataframe(df)
+
+def main(df):
+    option = st.selectbox('Data option',('table','timeline'))
+    if option == 'table':
+        table(df)
+    else:
+        timeline(df)
 
 main(df)
