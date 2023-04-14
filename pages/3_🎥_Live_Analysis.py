@@ -9,7 +9,7 @@ columns = ['Duration','Revenue (Rp)','Products',
            'Comments','Shares','Likes','New Followers','Product Impressions',
            'Product Clicks','CTR']
 
-df = pd.read_excel('data\data2.xlsx',
+df = pd.read_excel('data/analisis_live.xlsx',
                    sheet_name='Sheet1')
 def new_header(df):
     New_header = df.iloc[1] #grab the first row for the header
