@@ -8,30 +8,38 @@ columns = ['Duration','Revenue (Rp)','Products',
            'Viewers','Views','ACU','PCU','Avg. Viewing Duration',
            'Comments','Shares','Likes','New Followers','Product Impressions',
            'Product Clicks','CTR']
-#new_columns = columns.append('conversion')
+
 df = pd.read_excel('data\data2.xlsx',
                    sheet_name='Sheet1')
+def new_header(df):
+    New_header = df.iloc[1] #grab the first row for the header
+    df = df[2:] #take the data less the header row
+    df = df.reset_index(drop=True)
+    df.columns = New_header #set the header row as the df header
+    return df
 
-new_header = df.iloc[1] #grab the first row for the header
-df = df[2:] #take the data less the header row
-df = df.reset_index(drop=True)
-df.columns = new_header #set the header row as the df header
+def numeric(df):
+    for i in range(len(columns)):
+        df[columns[i]]= pd.to_numeric(df[columns[i]])
+    return df
+
+def duration(df):
+    for i in range(len(df)):
+        s = df['Duration'][i]
+        hm = re.findall("\d+", s) #returns list containing ['hr', 'min']
+        hm = [int(x) for x in hm]
+        duration = hm[0]*60+hm[1]
+        df['Duration'][i] = int(duration)
+        df['CO rate'][i] = float(df['CO rate'][i].replace("%", ""))
+        df['CTR'][i] = float(df['CTR'][i].replace("%", "")) 
+    return df
+
+df = new_header(df)
 datetime = pd.to_datetime(df['Launched Time'])
 df['Launched Time'] = datetime
 df = df.drop(['Creator ID','Creator','Nickname'], axis=1)
-
-for i in range(len(df)):
-  s = df['Duration'][i]
-  hm = re.findall("\d+", s) #returns list containing ['hr', 'min']
-  hm = [int(x) for x in hm]
-  duration = hm[0]*60+hm[1]
-  df['Duration'][i] = int(duration)
-  df['CO rate'][i] = float(df['CO rate'][i].replace("%", ""))
-  df['CTR'][i] = float(df['CTR'][i].replace("%", ""))
-  
-for i in range(len(columns)):
-  df[columns[i]]= pd.to_numeric(df[columns[i]])
-
+df = duration(df)
+df = numeric(df)
 columns.append('conversion')
 df['conversion'] = df['Unit Sales']/df['Viewers']
 df['conversion'] = df['conversion'].fillna(0)
@@ -48,24 +56,18 @@ with col1:
     option = st.selectbox(
         "Select KPI",
         (columns),
-        #label_visibility=st.session_state.visibility,
-        #disabled=st.session_state.disabled,
     )
 
 with col2:
     option2 = st.selectbox(
         "Select KPI 2",
         (columns),
-        #label_visibility=st.session_state.visibility,
-        #disabled=st.session_state.disabled,
     )
 
 with col3:
     option3 = st.selectbox(
         "Select KPI 3",
         (columns),
-        #label_visibility=st.session_state.visibility,
-        #disabled=st.session_state.disabled,
     )
 
 x = 'Launched Time'
