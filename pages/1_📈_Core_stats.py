@@ -6,7 +6,7 @@ columns = ['Income','initial checkout/add to cart','Awareness/impression',
            'Total order','Product sold','SKU sold (varian)','GPM'
            ,'Top Domicile', 'Fav Product','avg. spending per consumer']
 
-columns_core = ['Revenue (Rp)','Shopping Center Revenue','Product Views',
+columns_core = ['Revenue (Rp)','Shopping Center Revenue','Product Views ',
                 'Product Reach','Buyers','Unit Sales','Orders','Refunds (Rp)',
                 'Conversion Rate','Visitors','Negative Review Rate','Rate of Returns for Quality Reasons',
                 'Complaint Rate','Affiliate revenue (Rp)','Owned media revenue (Rp)']
@@ -27,12 +27,13 @@ def new_header(df):
 
 def numeric(df):
     for i in range(len(columns_core)):
-        df[columns_core[i]]= pd.to_numeric(df[columns_core[i]])
+        df[columns_core[i]]= pd.to_numeric(df[columns_core[i]],errors='coerce')
     return df
 
 def table(df):
     df = new_header(df)
     datetime = pd.to_datetime(df['Time'])
+    df = numeric(df)
     df['Time'] = datetime
     
     df = df.drop(['Refunds (Rp)','Negative Review Rate','Rate of Returns for Quality Reasons',
@@ -47,6 +48,7 @@ def timeline(df):
     datetime = pd.to_datetime(df['Time'])
     df['Time'] = datetime
     df = numeric(df)
+
     df = df.drop(['Refunds (Rp)','Negative Review Rate','Rate of Returns for Quality Reasons',
                 'Complaint Rate','Affiliate revenue (Rp)'], axis=1)
     
