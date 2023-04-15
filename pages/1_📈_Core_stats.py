@@ -83,7 +83,7 @@ def timeline(df):
     y = [option,option2,option3]
 
     fig = px.line(df,x=x ,y=option)
-    fig2 = px.line(df_norm, y=y)
+    fig2 = px.line(df_norm,x=x,y=y)
     st.plotly_chart(fig)
     st.plotly_chart(fig2)
 
