@@ -1,8 +1,9 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import numpy as np
 
-columns = ['Income','initial checkout/add to cart','Awareness/impression',
+columns = ['Income (Revenue)','initial checkout/add to cart (Conversion)','Awareness/impression',
            'Total order','Product sold','SKU sold (varian)','GPM'
            ,'Top Domicile', 'Fav Product','avg. spending per consumer']
 
@@ -13,6 +14,24 @@ columns_core = ['Revenue (Rp)','Shopping Center Revenue','Product Views ',
 
 df = pd.read_excel('data/core_stats.xlsx')
 
+def df_new(df):
+    df2 = pd.DataFrame()
+    df = new_header(df)
+    datetime = pd.to_datetime(df['Time'])
+    df['Time'] = datetime
+    df2['Time'] = df['Time']
+    df2[columns[0]] = df[columns_core[0]]
+    df2[columns[1]] = df[columns_core[8]]
+    df2[columns[2]] = np.random.rand(len(df.index))
+    df2[columns[3]] = np.random.rand(len(df.index))
+    df2[columns[4]] = np.random.rand(len(df.index))
+    df2[columns[5]] = np.random.rand(len(df.index))
+    df2[columns[6]] = np.random.rand(len(df.index))
+    df2[columns[7]] = np.random.rand(len(df.index))
+    df2[columns[8]] = np.random.rand(len(df.index))
+    df2[columns[9]] = np.random.rand(len(df.index))
+    return df2
+    
 def date_range(df):
     df = pd.DataFrame(df.columns)
     df = df.iloc[0]
@@ -25,15 +44,15 @@ def new_header(df):
     df.columns = New_header #set the header row as the df header
     return df
 
-def numeric(df):
-    for i in range(len(columns_core)):
-        df[columns_core[i]]= pd.to_numeric(df[columns_core[i]],errors='coerce')
+def numeric(df,column):
+    for i in range(len(column)):
+        df[column[i]]= pd.to_numeric(df[column[i]],errors='coerce')
     return df
 
 def table(df):
     df = new_header(df)
     datetime = pd.to_datetime(df['Time'])
-    df = numeric(df)
+    df = numeric(df,columns_core)
     df['Time'] = datetime
     
     df = df.drop(['Refunds (Rp)','Negative Review Rate','Rate of Returns for Quality Reasons',
@@ -47,10 +66,7 @@ def timeline(df):
     df = new_header(df)
     datetime = pd.to_datetime(df['Time'])
     df['Time'] = datetime
-    df = numeric(df)
-
-    df = df.drop(['Refunds (Rp)','Negative Review Rate','Rate of Returns for Quality Reasons',
-                'Complaint Rate','Affiliate revenue (Rp)'], axis=1)
+    df = numeric(df,columns_core)
     
     df.sort_values(by='Time',inplace=True)
     df = df.reset_index(drop=True)
@@ -83,17 +99,19 @@ def timeline(df):
     y = [option,option2,option3]
 
     fig = px.line(df,x=x ,y=option)
-    fig2 = px.line(df_norm,x=x,y=y)
+    fig2 = px.line(df_norm,df['Time'],y=y)
     st.plotly_chart(fig)
     st.plotly_chart(fig2)
 
 def main(df):
  
-    option = st.selectbox('Data option',('table','timeline'))
+    option = st.selectbox('Data option',('table','timeline','main'))
   
     if option == 'table':
         table(df)
-    else:
+    elif option == 'timeline':
         timeline(df)
+    else:
+        st.dataframe(df_new(df))
     
 main(df)
