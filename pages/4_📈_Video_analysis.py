@@ -52,23 +52,26 @@ def product(df):
 
 def creator(df):
     creators = pd.DataFrame(df['Creator name'].value_counts())
-    creators = creators.rename(columns={"Creator name": "videos made"})
-    return creators
+    return creators.index
 
 def query(df):
-    df = df.query()
+    c = creator(df)
+    option = st.selectbox('creator',c)
+    df = df[df['Creator name'] == option]
+    return(df)
+
 def main(df):
     a = date_range(df)
     date = st.selectbox('Date',a)
     option = st.selectbox('Data option',('raw data','Products sold','creator'))
     df = dataframe(df)
     products = product(df)
-    creators = creator(df)
+    
     if option == 'raw data':
         st.dataframe(df,use_container_width=True)
     elif option == 'Products sold':
         st.dataframe(products,use_container_width=True)
     else:
-        st.dataframe(creators,use_container_width=True)
+        st.dataframe(query(df))
 
 main(df)
