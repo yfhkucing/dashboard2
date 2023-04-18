@@ -103,6 +103,11 @@ def timeline(df):
     st.plotly_chart(fig)
     st.plotly_chart(fig2)
 
+def sortby(df):
+
+    st.selectbox('sort by',['product','sales'])
+    st.dataframe(df)
+
 def main(df):
  
     option = st.selectbox('Data option',('table','timeline','main'))
@@ -112,6 +117,6 @@ def main(df):
     elif option == 'timeline':
         timeline(df)
     else:
-        st.dataframe(df_new(df))
+        sortby(df)
     
 main(df)

@@ -11,6 +11,6 @@ st.sidebar.success("Select a menu above.")
 
 st.markdown(
     """
-    Ini dashboard
+    still under construction, updates are underway
 """
 )

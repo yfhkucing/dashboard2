@@ -39,20 +39,36 @@ def duration(df):
         df['CTR'][i] = float(df['CTR'][i].replace("%", "")) 
     return df
 
-def main(df):
-    a = date_range(df)
-    date = st.selectbox('Date',a)
-    
-    option = st.selectbox('Data option',('raw data','Products sold'))
+def dataframe(df):
     df = new_header(df)
     df = df.drop(['Video Info','Video ID'], axis=1)
+    return df
+
+def product(df):
     products = df['Products'].dropna()
     products = pd.DataFrame(products.value_counts())
     products = products.rename(columns={"Products": "unit sold"})
+    return products
 
+def creator(df):
+    creators = pd.DataFrame(df['Creator name'].value_counts())
+    creators = creators.rename(columns={"Creator name": "videos made"})
+    return creators
+
+def query(df):
+    df = df.query()
+def main(df):
+    a = date_range(df)
+    date = st.selectbox('Date',a)
+    option = st.selectbox('Data option',('raw data','Products sold','creator'))
+    df = dataframe(df)
+    products = product(df)
+    creators = creator(df)
     if option == 'raw data':
         st.dataframe(df,use_container_width=True)
-    else:
+    elif option == 'Products sold':
         st.dataframe(products,use_container_width=True)
+    else:
+        st.dataframe(creators,use_container_width=True)
 
 main(df)
