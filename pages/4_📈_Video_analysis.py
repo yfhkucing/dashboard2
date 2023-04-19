@@ -48,6 +48,11 @@ def product(df):
     products = products.rename(columns={"Products": "unit sold"})
     return products
 
+def product_sum_table(df):
+    df = numeric(df)
+    df = df.groupby('Products').sum().reset_index()
+    return(df)
+
 def creator(df):
     creators = pd.DataFrame(df['Creator name'].value_counts())
     return creators.index
@@ -80,22 +85,33 @@ def creator_sum_table(df):
 def main(df):
     a = date_range(df)
     date = st.selectbox('Date',a)
-    option = st.selectbox('Data option',('raw data','Products sold','creator','creator table'))
+    option = st.selectbox('Data option',('raw data','Products sold','product rank','creator rank','creator table'))
     df = dataframe(df)
     products = product(df)
     
     if option == 'raw data':
         st.dataframe(df,use_container_width=True)
+
     elif option == 'Products sold':
         st.dataframe(products,use_container_width=True)
-    elif option == 'creator table':
-        st.dataframe(query(df))
-    else:
+
+    elif option == 'product rank':
+        df = product_sum_table(df)
+        df = df.drop(['CTR','CO rate','Est. commission (Rp)',
+                      'Refunds (Rp)','Product refunds','New followers'], axis=1)
+        df = df.sort_values(by=['Video Revenue (Rp)'],ascending=False)
+        df = df.reset_index(drop=True)
+        st.dataframe(df)
+
+    elif option == 'creator rank':
         df = creator_sum_table(df)
         df = df.drop(['CTR','CO rate','Est. commission (Rp)',
                       'Refunds (Rp)','Product refunds'], axis=1)
         df = df.sort_values(by=['Video Revenue (Rp)'],ascending=False)
         df = df.reset_index(drop=True)
         st.dataframe(df)
+
+    elif option == 'creator table':
+        st.dataframe(query(df))
 
 main(df)
