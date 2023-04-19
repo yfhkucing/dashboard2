@@ -2,17 +2,18 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import numpy as np
+import glob
 
 columns = ['Income (Revenue)','initial checkout/add to cart (Conversion)','Awareness/impression',
            'Total order','Product sold','SKU sold (varian)','GPM'
            ,'Top Domicile', 'Fav Product','avg. spending per consumer']
 
-columns_core = ['Revenue (Rp)','Shopping Center Revenue','Product Views ',
+columns_core = ['Revenue (Rp)','Shopping Center Revenue','Product Views',
                 'Product Reach','Buyers','Unit Sales','Orders','Refunds (Rp)',
                 'Conversion Rate','Visitors','Negative Review Rate','Rate of Returns for Quality Reasons',
                 'Complaint Rate','Affiliate revenue (Rp)','Owned media revenue (Rp)']
 
-df = pd.read_excel('data/core_stats.xlsx')
+path = r'data/core_stats' 
 
 def df_new(df):
     df2 = pd.DataFrame()
@@ -55,22 +56,16 @@ def table(df):
     df = numeric(df,columns_core)
     df['Time'] = datetime
     
+    df.sort_values(by='Time',inplace=True)
+    df = df.reset_index(drop=True)
+    return df
+
+def show_table(df):
     df = df.drop(['Refunds (Rp)','Negative Review Rate','Rate of Returns for Quality Reasons',
                 'Complaint Rate','Affiliate revenue (Rp)'], axis=1)
-    
-    df.sort_values(by='Time',inplace=True)
-    df = df.reset_index(drop=True)
     st.dataframe(df)
 
-def timeline(df):
-    df = new_header(df)
-    datetime = pd.to_datetime(df['Time'])
-    df['Time'] = datetime
-    df = numeric(df,columns_core)
-    
-    df.sort_values(by='Time',inplace=True)
-    df = df.reset_index(drop=True)
-
+def show_timeline(df):
     df_norm = df.copy()
     for column in df_norm.columns:
         df_norm[column] = (df_norm[column] - df_norm[column].min()) / (df_norm[column].max() - df_norm[column].min()) 
@@ -103,20 +98,33 @@ def timeline(df):
     st.plotly_chart(fig)
     st.plotly_chart(fig2)
 
-def sortby(df):
+def join_table(list):
+    l = []
+    for i in range(len(list)):
+        dframe = table(list[i])
+        l.append(dframe)
+    df = pd.concat(l)
+    return df
 
-    st.selectbox('sort by',['product','sales'])
-    st.dataframe(df)
+def main(path):
 
-def main(df):
- 
-    option = st.selectbox('Data option',('table','timeline','main'))
-  
-    if option == 'table':
-        table(df)
-    elif option == 'timeline':
-        timeline(df)
-    else:
-        sortby(df)
+    all_files = glob.glob(path + "/*.xlsx")
+    li = []
+
+    for filename in all_files:
+        da = pd.read_excel(filename)
+        da = table(da)
+        li.append(da)
+
+    df = pd.concat(li)
+    df = df.drop_duplicates(df)
+    df = df.reset_index(drop=True)
+
+    option = st.selectbox('Data option',('timeline','table'))
     
-main(df)
+    if option == 'table':
+        show_table(df)
+    elif option == 'timeline':
+        show_timeline(df)
+    
+main(path)

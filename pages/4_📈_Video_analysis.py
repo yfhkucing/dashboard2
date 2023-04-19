@@ -5,8 +5,9 @@ import plotly.express as px
 columns = ['Creator name', 'Creator ID', 'Video Info', 'Video ID', 'Products',
            'Video Revenue (Rp)','Unit Sales','Orders','Buyers','Est. commission (Rp)',
            'Refunds (Rp)','Product refunds','CO rate','VV','Likes','Comments','Shares',
-           'Product Impressions', 'Product Clicks', 'New followers','CTR'
-]
+           'Product Impressions', 'Product Clicks', 'New followers','CTR']
+
+
 
 df = pd.read_excel('data/analisis_konten.xlsx',
                    sheet_name='Sheet1')

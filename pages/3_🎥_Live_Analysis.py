@@ -2,6 +2,8 @@ import pandas as pd
 import re
 import streamlit as st
 import plotly.express as px
+import glob
+
 columns = ['Duration','Revenue (Rp)','Products',	
            'Different Products Sold','Orders Created','Orders Paid',
            'Unit Sales','Buyers','Average Price (Rp)','CO rate',
@@ -9,8 +11,8 @@ columns = ['Duration','Revenue (Rp)','Products',
            'Comments','Shares','Likes','New Followers','Product Impressions',
            'Product Clicks','CTR']
 
-df = pd.read_excel('data/analisis_live.xlsx',
-                   sheet_name='Sheet1')
+path = r'data/live_analysis'
+
 def new_header(df):
     New_header = df.iloc[1] #grab the first row for the header
     df = df[2:] #take the data less the header row
@@ -34,18 +36,7 @@ def duration(df):
         df['CTR'][i] = float(df['CTR'][i].replace("%", "")) 
     return df
 
-def timeline(df):
-    df = new_header(df)
-    datetime = pd.to_datetime(df['Launched Time'])
-    df['Launched Time'] = datetime
-    df = df.drop(['Creator ID','Creator','Nickname'], axis=1)
-    df = duration(df)
-    df = numeric(df)
-    columns.append('conversion')
-    df['conversion'] = df['Unit Sales']/df['Viewers']
-    df['conversion'] = df['conversion'].fillna(0)
-    df.sort_values(by='Launched Time',inplace=True)
-    df = df.reset_index(drop=True)
+def show_timeline(df):
 
     df_norm = df.copy()
     for column in df_norm.columns:
@@ -81,24 +72,40 @@ def timeline(df):
 
 def table(df):
     df = new_header(df)
+    df = df.drop(['Creator ID','Creator','Nickname'], axis=1)
     datetime = pd.to_datetime(df['Launched Time'])
     df['Launched Time'] = datetime
-    df = df.drop(['Creator ID','Creator','Nickname'], axis=1)
     df = duration(df)
     df = numeric(df)
-    columns.append('conversion')
     df['conversion'] = df['Unit Sales']/df['Viewers']
     df['conversion'] = df['conversion'].fillna(0)
     df.sort_values(by='Launched Time',inplace=True)
     df = df.reset_index(drop=True)
-    df['Revenue delta'] = df['Revenue (Rp)'].diff().shift(-1)
+    return df
+
+def show_table(df):
     st.dataframe(df)
 
-def main(df):
+def main(path):
+
+    all_files = glob.glob(path + "/*.xlsx")
+    li = []
+
+    for filename in all_files:
+        da = pd.read_excel(filename)
+        da = table(da)
+        li.append(da)
+    df = pd.concat(li)
+    df = df.drop_duplicates(df)
+    df.sort_values(by='Launched Time',inplace=True)
+    df = df.reset_index(drop=True)
+
+    columns.append('conversion')
     option = st.selectbox('Data option',('table','timeline'))
     if option == 'table':
-        table(df)
+        show_table(df)  
     else:
-        timeline(df)
+        show_timeline(df)
+    
 
-main(df)
+main(path)
