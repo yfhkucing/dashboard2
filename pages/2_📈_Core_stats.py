@@ -126,5 +126,5 @@ def main(path):
         show_table(df)
     elif option == 'timeline':
         show_timeline(df)
-    
+   
 main(path)

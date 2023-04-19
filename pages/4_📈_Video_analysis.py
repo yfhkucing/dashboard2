@@ -2,12 +2,13 @@ import pandas as pd
 import re
 import streamlit as st
 import plotly.express as px
+import glob
 columns = ['Video Revenue (Rp)','Unit Sales','Orders','Buyers','Est. commission (Rp)',
            'Refunds (Rp)','Product refunds','CO rate','VV','Likes','Comments','Shares',
            'Product Impressions', 'Product Clicks', 'New followers','CTR']
 
-df = pd.read_excel('data/analisis_konten.xlsx',
-                   sheet_name='Sheet1')
+
+path = r'data/video_analysis'
 
 def date_range(df):
     df = pd.DataFrame(df.columns)
@@ -45,7 +46,7 @@ def dataframe(df):
 def product(df):
     products = df['Products'].dropna()
     products = pd.DataFrame(products.value_counts())
-    products = products.rename(columns={"Products": "unit sold"})
+    products = products.rename(columns={"Products": "product featured in video"})
     return products
 
 def product_sum_table(df):
@@ -83,16 +84,14 @@ def creator_sum_table(df):
     return(df)
 
 def main(df):
-    a = date_range(df)
-    date = st.selectbox('Date',a)
-    option = st.selectbox('Data option',('raw data','Products sold','product rank','creator rank','creator table'))
+    option = st.selectbox('Data option',('raw data','Products featured','product rank','creator rank','creator table'))
     df = dataframe(df)
     products = product(df)
     
     if option == 'raw data':
         st.dataframe(df,use_container_width=True)
 
-    elif option == 'Products sold':
+    elif option == 'Products featured':
         st.dataframe(products,use_container_width=True)
 
     elif option == 'product rank':
@@ -114,4 +113,25 @@ def main(df):
     elif option == 'creator table':
         st.dataframe(query(df))
 
-main(df)
+def main2(path):
+    all_files = glob.glob(path + "/*.xlsx")
+    li = []
+    li2 = []
+    li_array=[]
+    for filename in all_files:
+        da = pd.read_excel(filename)
+        dr = date_range(da)
+        li.append(da)
+        li2.append(dr)
+    for i in range(len(li2)):
+        a = str(li2[i])
+        a = a[18:42]
+        li_array.append(a)
+  
+    date = st.selectbox('Date',li_array)
+    b = li_array.index(date)
+    st.write(b)
+    df = li[b]
+    main(df)
+
+main2(path)
