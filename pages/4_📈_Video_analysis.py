@@ -2,12 +2,9 @@ import pandas as pd
 import re
 import streamlit as st
 import plotly.express as px
-columns = ['Creator name', 'Creator ID', 'Video Info', 'Video ID', 'Products',
-           'Video Revenue (Rp)','Unit Sales','Orders','Buyers','Est. commission (Rp)',
+columns = ['Video Revenue (Rp)','Unit Sales','Orders','Buyers','Est. commission (Rp)',
            'Refunds (Rp)','Product refunds','CO rate','VV','Likes','Comments','Shares',
            'Product Impressions', 'Product Clicks', 'New followers','CTR']
-
-
 
 df = pd.read_excel('data/analisis_konten.xlsx',
                    sheet_name='Sheet1')
@@ -55,16 +52,35 @@ def creator(df):
     creators = pd.DataFrame(df['Creator name'].value_counts())
     return creators.index
 
+def numeric(df):
+    for i in range(len(columns)):
+        df[columns[i]]= pd.to_numeric(df[columns[i]],errors='coerce')
+    return df
+
 def query(df):
     c = creator(df)
     option = st.selectbox('creator',c)
     df = df[df['Creator name'] == option]
     return(df)
 
+def creator_sum(df):
+    df = query(df)
+    df = numeric(df)
+    df = df.drop(['Creator name','Creator ID','Products','CTR',
+                      'CO rate','Est. commission (Rp)',
+                      'Refunds (Rp)','Product refunds'], axis=1)
+    df = df.sum()
+    return df
+
+def creator_sum_table(df):
+    df = numeric(df)
+    df = df.groupby('Creator name').sum().reset_index()
+    return(df)
+
 def main(df):
     a = date_range(df)
     date = st.selectbox('Date',a)
-    option = st.selectbox('Data option',('raw data','Products sold','creator'))
+    option = st.selectbox('Data option',('raw data','Products sold','creator','creator table'))
     df = dataframe(df)
     products = product(df)
     
@@ -72,7 +88,14 @@ def main(df):
         st.dataframe(df,use_container_width=True)
     elif option == 'Products sold':
         st.dataframe(products,use_container_width=True)
-    else:
+    elif option == 'creator table':
         st.dataframe(query(df))
+    else:
+        df = creator_sum_table(df)
+        df = df.drop(['CTR','CO rate','Est. commission (Rp)',
+                      'Refunds (Rp)','Product refunds'], axis=1)
+        df = df.sort_values(by=['Video Revenue (Rp)'],ascending=False)
+        df = df.reset_index(drop=True)
+        st.dataframe(df)
 
 main(df)
