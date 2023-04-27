@@ -17,15 +17,15 @@ st.markdown(
     
     """ )
 
-path2 = 'data/core_stats'
-def save_uploadedfile(uploadedfile,path):
-     with open(os.path.join(path,uploadedfile.name),"wb") as f:
-         f.write(uploadedfile.getbuffer())
-     return st.success("Saved File:{} to core_stats".format(uploadedfile.name))
+#path2 = 'data/core_stats'
+#def save_uploadedfile(uploadedfile,path):
+#     with open(os.path.join(path,uploadedfile.name),"wb") as f:
+#         f.write(uploadedfile.getbuffer())
+#     return st.success("Saved File:{} to core_stats".format(uploadedfile.name))
 
-datafile = st.file_uploader("Upload core statistic",type=['xlsx'])
-if datafile is not None:
-   file_details = {"FileName":datafile.name,"FileType":datafile.type}
-   df  = pd.read_excel(datafile)
-   st.dataframe(df)
-   save_uploadedfile(datafile,path2)
+#datafile = st.file_uploader("Upload core statistic",type=['xlsx'])
+#if datafile is not None:
+#   file_details = {"FileName":datafile.name,"FileType":datafile.type}
+#   df  = pd.read_excel(datafile)
+#   st.dataframe(df)
+#   save_uploadedfile(datafile,path2)
